@@ -45,13 +45,23 @@ def test_check_position():
     game._check_position()
     assert game.game_status == '0 win!'
 
-    game._field = [[4, 0, 0], [0, 4, 0], [0, 0, 4]]
+    game._field = [[4, 0, 0],
+                   [0, 4, 0],
+                   [0, 0, 4]]
     game._check_position()
     assert game.game_status == '0 win!'
 
-    game._field = [[0, 0, 4], [0, 4, 0], [4, 0, 0]]
+    game._field = [[0, 0, 4],
+                   [0, 4, 0],
+                   [4, 0, 0]]
     game._check_position()
     assert game.game_status == '0 win!'
+
+    game._field = [[4, 1, 4],
+                   [1, 1, 4],
+                   [4, 4, 1]]
+    game._check_position()
+    assert game.game_status == 'Game over. Draw.'
 
 def test_make_turn():
     game = TicTacToe()

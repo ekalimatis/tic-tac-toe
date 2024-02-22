@@ -110,14 +110,13 @@ class TicTacToe:
             self._turns_count += 1
             self._check_position()
             self._my_turn = not self._my_turn
-            print(self)
             if player == Player.X:
                 player = Player.O
             else:
                 player = Player.X
-            if self._is_over:
-                print(self.game_status)
-                break
+            print(self)
+        print(self.game_status)
+
 
     def start_new_game(self):
         pass
