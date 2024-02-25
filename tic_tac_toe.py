@@ -29,18 +29,17 @@ def consol_display(field: list[list]) -> None:
         field_for_print += row_for_print
     print(field_for_print)
 
-class TicTacToe:
-#     cell_mask = {
-#         Player.EMPTY.value: ' ',
-#         Player.X.value: 'X',
-#         Player.O.value: 'O'
-#     }
+FIELD_SIZE = 3
 
+class TicTacToe:
     def __init__(self) -> None:
-        self._field = [[Player.EMPTY for _ in range(3)] for _ in range(3)]
-        self._turns_count = 0
-        self.game_status = 'Next turn'
-        self._is_over = False
+        self._field = []
+        self._free_cells = []
+        for row in range(FIELD_SIZE):
+            self._field.append([])
+            for col in range(FIELD_SIZE):
+                self._field[-1].append(Player.EMPTY)
+                self._free_cells.append((row, col))
         self._my_turn = random.choice([True, False])
 
     def _validate_turn(self, turn: str) -> tuple[int, int]:
@@ -48,7 +47,7 @@ class TicTacToe:
             row, col = list(int(_) for _ in turn.split(','))
         except ValueError:
             raise FormatTurnError
-        if not 0 <= row <= 2 or not 0 <= row <= 2:
+        if not 0 <= row <= FIELD_SIZE - 1 or not 0 <= row <= FIELD_SIZE - 1:
             raise RangeTurnError
         if self._field[row][col] != Player.EMPTY:
             raise CellAlreadyFillError
@@ -93,7 +92,7 @@ class TicTacToe:
             try:
                 turn = self._validate_turn(player_turn)
             except (FormatTurnError, RangeTurnError):
-                print('Wrong turn, col and row must be >= 0 and <= 2')
+                print(f'Wrong turn, col and row must be >= 0 and <= {FIELD_SIZE}')
             except CellAlreadyFillError:
                 print('Cell already fill, choose another turn.')
             else:
@@ -104,14 +103,12 @@ class TicTacToe:
         player = Player.X
         print('Game start')
         consol_display(self._field)
-        while not self._is_over:
+        while True:
             if self._my_turn:
                 print('My turn!')
-            else:
-                print('Your turn!')
-            if self._my_turn:
                 turn = self._computer_turn()
             else:
+                print('Your turn!')
                 turn = self._player_turn()
             self.set_turn(turn, player)
             consol_display(self._field)
@@ -120,7 +117,6 @@ class TicTacToe:
                 break
             if not self._get_free_cells():
                 print('Draw!')
-            # self._turns_count += 1
             self._my_turn = not self._my_turn
             if player == Player.X:
                 player = Player.O
