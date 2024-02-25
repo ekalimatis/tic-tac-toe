@@ -73,7 +73,7 @@ class TicTacToe:
 
         return False
 
-    def _get_free_cells(self):
+    def _get_free_cells(self) -> list[tuple[int, int]]:
         free_cells = []
         for row, _ in enumerate(self._field):
             for col, _ in enumerate(_):
@@ -85,19 +85,18 @@ class TicTacToe:
         turn = random.choice(self._get_free_cells())
         return turn
 
-    def _player_turn(self):
-        is_correct_turn = False
-        while not is_correct_turn:
+    def _player_turn(self) -> tuple[int, int]:
+        while True:
             player_turn = input('Enter your turn in following format <row>,<column>: ')
             try:
                 turn = self._validate_turn(player_turn)
             except (FormatTurnError, RangeTurnError):
-                print(f'Wrong turn, col and row must be >= 0 and <= {FIELD_SIZE}')
+                print(f'Wrong turn, col and row must be >= 0 and <= {FIELD_SIZE - 1}')
             except CellAlreadyFillError:
                 print('Cell already fill, choose another turn.')
             else:
-                is_correct_turn = True
-        return turn
+                return turn
+
 
     def run(self) -> None:
         player = Player.X
