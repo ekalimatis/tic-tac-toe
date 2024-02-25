@@ -1,22 +1,27 @@
 import random
-from enum import Enum
+
 
 class ValidationTurnError(Exception):
     pass
 
+
 class FormatTurnError(ValidationTurnError):
     pass
+
 
 class RangeTurnError(ValidationTurnError):
     pass
 
+
 class CellAlreadyFillError(ValidationTurnError):
     pass
+
 
 class Player:
     EMPTY = ' '
     X = 'X'
     O = '0'
+
 
 def consol_display(field: list[list]) -> None:
     field_for_print = ''
@@ -29,11 +34,14 @@ def consol_display(field: list[list]) -> None:
         field_for_print += row_for_print
     print(field_for_print)
 
+
 FIELD_SIZE = 3
+
 
 class TicTacToe:
     def __init__(self) -> None:
         self._field = []
+        # Not used yet.
         self._free_cells = []
         for row in range(FIELD_SIZE):
             self._field.append([])
@@ -54,6 +62,7 @@ class TicTacToe:
         return row, col
 
     def set_turn(self, turn: tuple[int, int], player: Player) -> None:
+        # Make class Turn..?
         row, col = turn
         self._field[row][col] = player
 
@@ -68,7 +77,8 @@ class TicTacToe:
         if row == col and len(set([self._field[n][n] for n, _ in enumerate(self._field)])) == 1:
             return True
 
-        if row + col == len(self._field) - 1 and len(set([self._field[n][len(self._field) - n - 1] for n, _ in enumerate(self._field)])) == 1:
+        if row + col == len(self._field) - 1 and len(
+                set([self._field[n][len(self._field) - n - 1] for n, _ in enumerate(self._field)])) == 1:
             return True
 
         return False
@@ -97,7 +107,6 @@ class TicTacToe:
             else:
                 return turn
 
-
     def run(self) -> None:
         player = Player.X
         print('Game start')
@@ -122,6 +131,7 @@ class TicTacToe:
             else:
                 player = Player.X
 
+
 def main():
     one_more_game = True
     while one_more_game:
@@ -130,6 +140,7 @@ def main():
         answer = input('One more game y/n?')
         if answer != 'y':
             one_more_game = False
+
 
 if __name__ == '__main__':
     main()
