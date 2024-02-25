@@ -61,7 +61,7 @@ class TicTacToe:
             raise CellAlreadyFillError
         return row, col
 
-    def set_turn(self, turn: tuple[int, int], player: Player) -> None:
+    def _set_turn(self, turn: tuple[int, int], player: str) -> None:
         # Make class Turn..?
         row, col = turn
         self._field[row][col] = player
@@ -71,14 +71,14 @@ class TicTacToe:
         if len(set(self._field[row])) == 1:
             return True
 
-        if len(set([_[col] for _ in self._field])) == 1:
+        if len({[_[col] for _ in self._field]}) == 1:
             return True
 
-        if row == col and len(set([self._field[n][n] for n, _ in enumerate(self._field)])) == 1:
+        if row == col and len({[self._field[n][n] for n, _ in enumerate(self._field)]}) == 1:
             return True
 
         if row + col == len(self._field) - 1 and len(
-                set([self._field[n][len(self._field) - n - 1] for n, _ in enumerate(self._field)])) == 1:
+                {[self._field[n][len(self._field) - n - 1] for n, _ in enumerate(self._field)]}) == 1:
             return True
 
         return False
@@ -118,7 +118,7 @@ class TicTacToe:
             else:
                 print('Your turn!')
                 turn = self._player_turn()
-            self.set_turn(turn, player)
+            self._set_turn(turn, player)
             consol_display(self._field)
             if self._check_winner_by_turn(turn):
                 print(f'{player} win!')
@@ -133,13 +133,12 @@ class TicTacToe:
 
 
 def main():
-    one_more_game = True
-    while one_more_game:
+    while True:
         game = TicTacToe()
         game.run()
-        answer = input('One more game y/n?')
+        answer = input('One more game yes(y)?')
         if answer != 'y':
-            one_more_game = False
+            break
 
 
 if __name__ == '__main__':
