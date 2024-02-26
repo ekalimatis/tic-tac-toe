@@ -28,11 +28,11 @@ def consol_display(field: list[list]) -> None:
     for row in field:
         row_for_print = ''
         for cell in row:
-            cell_for_print = '|' + cell
+            cell_for_print = '|' + str(cell)
             row_for_print += cell_for_print
         row_for_print += '|\n'
         field_for_print += row_for_print
-    print(field_for_print)
+    return field_for_print
 
 
 FIELD_SIZE = 3
@@ -55,7 +55,7 @@ class TicTacToe:
             row, col = list(int(_) for _ in turn.split(','))
         except ValueError:
             raise FormatTurnError
-        if not 0 <= row <= FIELD_SIZE - 1 or not 0 <= row <= FIELD_SIZE - 1:
+        if not 0 <= row <= FIELD_SIZE - 1 or not 0 <= col <= FIELD_SIZE - 1:
             raise RangeTurnError
         if self._field[row][col] != Player.EMPTY:
             raise CellAlreadyFillError
@@ -71,14 +71,14 @@ class TicTacToe:
         if len(set(self._field[row])) == 1:
             return True
 
-        if len({[_[col] for _ in self._field]}) == 1:
+        if len(set([_[col] for _ in self._field])) == 1:
             return True
 
-        if row == col and len({[self._field[n][n] for n, _ in enumerate(self._field)]}) == 1:
+        if row == col and len(set([self._field[n][n] for n, _ in enumerate(self._field)])) == 1:
             return True
 
         if row + col == len(self._field) - 1 and len(
-                {[self._field[n][len(self._field) - n - 1] for n, _ in enumerate(self._field)]}) == 1:
+                set([self._field[n][len(self._field) - n - 1] for n, _ in enumerate(self._field)])) == 1:
             return True
 
         return False
@@ -91,7 +91,7 @@ class TicTacToe:
                     free_cells.append((row, col))
         return free_cells
 
-    def _computer_turn(self) -> tuple[int, int]:
+    def _choose_computer_turn(self) -> tuple[int, int]:
         turn = random.choice(self._get_free_cells())
         return turn
 
@@ -110,16 +110,16 @@ class TicTacToe:
     def run(self) -> None:
         player = Player.X
         print('Game start')
-        consol_display(self._field)
+        print(consol_display(self._field))
         while True:
             if self._my_turn:
                 print('My turn!')
-                turn = self._computer_turn()
+                turn = self._choose_computer_turn()
             else:
                 print('Your turn!')
                 turn = self._player_turn()
             self._set_turn(turn, player)
-            consol_display(self._field)
+            print(consol_display(self._field))
             if self._check_winner_by_turn(turn):
                 print(f'{player} win!')
                 break
