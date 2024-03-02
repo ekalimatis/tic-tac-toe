@@ -23,7 +23,7 @@ class Player:
     O = '0'
 
 
-def consol_display(field: list[list]) -> None:
+def consol_display(field: list[list]) -> str:
     field_for_print = ''
     for row in field:
         row_for_print = ''
@@ -40,7 +40,8 @@ FIELD_SIZE = 3
 
 class TicTacToe:
     def __init__(self) -> None:
-        self._field = []
+        self._field: list[list[str]] = []
+
         # Not used yet.
         self._free_cells = []
         for row in range(FIELD_SIZE):
