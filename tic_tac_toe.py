@@ -1,135 +1,63 @@
-import random
+from random import shuffle
+from itertools import cycle
 
-
-class ValidationTurnError(Exception):
-    pass
-
-
-class FormatTurnError(ValidationTurnError):
-    pass
-
-
-class RangeTurnError(ValidationTurnError):
-    pass
-
-
-class CellAlreadyFillError(ValidationTurnError):
-    pass
-
-
-class Player:
-    EMPTY = ' '
-    X = 'X'
-    O = '0'
-
-
-def consol_display(field: list[list]) -> None:
-    field_for_print = ''
-    for row in field:
-        row_for_print = ''
-        for cell in row:
-            cell_for_print = '|' + str(cell)
-            row_for_print += cell_for_print
-        row_for_print += '|\n'
-        field_for_print += row_for_print
-    return field_for_print
-
+from board import Board
+from playres import PlayerWithMark, HumanPlayer, ComputerPlayer
 
 FIELD_SIZE = 3
+MARK_X = 'X'
+MARK_O = '0'
 
 
 class TicTacToe:
     def __init__(self) -> None:
-        self._field = []
-        # Not used yet.
-        self._free_cells = []
-        for row in range(FIELD_SIZE):
-            self._field.append([])
-            for col in range(FIELD_SIZE):
-                self._field[-1].append(Player.EMPTY)
-                self._free_cells.append((row, col))
-        self._my_turn = random.choice([True, False])
+        self._board = Board(FIELD_SIZE)
+        self.players: list[PlayerWithMark] = self._get_players()
 
-    def _validate_turn(self, turn: str) -> tuple[int, int]:
-        try:
-            row, col = list(int(_) for _ in turn.split(','))
-        except ValueError:
-            raise FormatTurnError
-        if not 0 <= row <= FIELD_SIZE - 1 or not 0 <= col <= FIELD_SIZE - 1:
-            raise RangeTurnError
-        if self._field[row][col] != Player.EMPTY:
-            raise CellAlreadyFillError
-        return row, col
+    @staticmethod
+    def _get_players() -> list[PlayerWithMark]:
+        players = [HumanPlayer, ComputerPlayer]
+        shuffle(players)
+        players_with_mark = []
+        for player, mark in zip(
+                players,
+                (MARK_X, MARK_O)
+                ):
+            players_with_mark.append(player(mark))
+        return players_with_mark
 
-    def _set_turn(self, turn: tuple[int, int], player: str) -> None:
-        # Make class Turn..?
-        row, col = turn
-        self._field[row][col] = player
+    @staticmethod
+    def _get_liner_winner(line: list[str | None]) -> str | None:
+        if len(set(line)) == 1:
+            return line[0]
+        return None
 
-    def _check_winner_by_turn(self, turn: tuple[int, int]) -> bool:
-        row, col = turn
-        if len(set(self._field[row])) == 1:
-            return True
-
-        if len(set([_[col] for _ in self._field])) == 1:
-            return True
-
-        if row == col and len(set([self._field[n][n] for n, _ in enumerate(self._field)])) == 1:
-            return True
-
-        if row + col == len(self._field) - 1 and len(
-                set([self._field[n][len(self._field) - n - 1] for n, _ in enumerate(self._field)])) == 1:
-            return True
-
-        return False
-
-    def _get_free_cells(self) -> list[tuple[int, int]]:
-        free_cells = []
-        for row, _ in enumerate(self._field):
-            for col, _ in enumerate(_):
-                if self._field[row][col] == Player.EMPTY:
-                    free_cells.append((row, col))
-        return free_cells
-
-    def _choose_computer_turn(self) -> tuple[int, int]:
-        turn = random.choice(self._get_free_cells())
-        return turn
-
-    def _player_turn(self) -> tuple[int, int]:
-        while True:
-            player_turn = input('Enter your turn in following format <row>,<column>: ')
-            try:
-                turn = self._validate_turn(player_turn)
-            except (FormatTurnError, RangeTurnError):
-                print(f'Wrong turn, col and row must be >= 0 and <= {FIELD_SIZE - 1}')
-            except CellAlreadyFillError:
-                print('Cell already fill, choose another turn.')
-            else:
-                return turn
+    def get_winner(self) -> str | None:
+        for line in self._board.get_all_lines():
+            winner_mark = self._get_liner_winner(line)
+            if winner_mark:
+                return winner_mark
+        return None
 
     def run(self) -> None:
-        player = Player.X
-        print('Game start')
-        print(consol_display(self._field))
-        while True:
-            if self._my_turn:
-                print('My turn!')
-                turn = self._choose_computer_turn()
-            else:
-                print('Your turn!')
-                turn = self._player_turn()
-            self._set_turn(turn, player)
-            print(consol_display(self._field))
-            if self._check_winner_by_turn(turn):
-                print(f'{player} win!')
-                break
-            if not self._get_free_cells():
-                print('Draw!')
-            self._my_turn = not self._my_turn
-            if player == Player.X:
-                player = Player.O
-            else:
-                player = Player.X
+        print('Game start!\n')
+        print(self._board)
+
+        is_game_over = False
+        while not is_game_over:
+            for player in cycle(self.players):
+                print(f"Player {player.mark} turn!")
+                turn = player.turn(self._board)
+                self._board.set_turn(turn, player.mark)
+                print(self._board)
+                if self.get_winner():
+                    print(f'{player.mark} win!')
+                    is_game_over = True
+                    break
+                if not self._board.get_free_cells():
+                    print('Draw!')
+                    is_game_over = True
+                    break
 
 
 def main():
@@ -141,5 +69,5 @@ def main():
             break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
